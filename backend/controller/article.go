@@ -20,8 +20,24 @@ type Article struct {
 	dbx *sqlx.DB
 }
 
+// type ArticleTags struct {
+// 	dbx *sqlx.DB
+// }
+
+type Comment struct {
+	dbx *sqlx.DB
+}
+
 func NewArticle(dbx *sqlx.DB) *Article {
 	return &Article{dbx: dbx}
+}
+
+// func NewArticleTags(dbx *sqlx.DB) *ArticleTags {
+// 	return &ArticleTags{dbx: dbx}
+// }
+
+func NewComment(dbx *sqlx.DB) *Comment {
+	return &Comment{dbx: dbx}
 }
 
 func (a *Article) Index(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
@@ -54,20 +70,65 @@ func (a *Article) Show(w http.ResponseWriter, r *http.Request) (int, interface{}
 	return http.StatusCreated, article, nil
 }
 
-func (a *Article) Create(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
-	newArticle := &model.Article{}
-	if err := json.NewDecoder(r.Body).Decode(&newArticle); err != nil {
+func (a *Comment) CreateComment(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
+	newComment := &model.Comment{}
+	if err := json.NewDecoder(r.Body).Decode(&newComment); err != nil {
 		return http.StatusBadRequest, nil, err
 	}
 
+	// ArticleIDをPATHから取得
+	vars := mux.Vars(r)
+	articleID, ok := vars["article_id"]
+	if !ok {
+		return http.StatusBadRequest, nil, &httputil.HTTPError{Message: "invalid path parameter"}
+	}
+
+	newComment.ArticleID, _ = strconv.ParseInt(articleID, 10, 64)
+
+	commentService := service.NewCommentService(a.dbx)
+
+	// UserIDの取得
+	user := &model.User{}
+	user, err := httputil.GetUserFromContext(r.Context())
+	newComment.UserID = user.ID
+
+	id, err := commentService.Create(newComment)
+	if err != nil {
+		return http.StatusInternalServerError, nil, err
+	}
+
+	newComment.ID = id
+	return http.StatusCreated, newComment, nil
+}
+
+func (a *Article) Create(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
+	requestArticle := &model.CreateArticleRequest{}
+	if err := json.NewDecoder(r.Body).Decode(&requestArticle); err != nil {
+		return http.StatusBadRequest, nil, err
+	}
 	articleService := service.NewArticleService(a.dbx)
-	id, err := articleService.Create(newArticle)
+
+	newArticle := &model.Article{}
+	newArticle.Body = requestArticle.Body
+	newArticle.Title = requestArticle.Title
+
+	user := &model.User{}
+	user, err := httputil.GetUserFromContext(r.Context())
+	newArticle.UserID = &user.ID
+	id, err := articleService.Create(newArticle, requestArticle.TagIDs)
 	if err != nil {
 		return http.StatusInternalServerError, nil, err
 	}
 	newArticle.ID = id
 
-	return http.StatusCreated, newArticle, nil
+	responseArticle := &model.CreateArticleResponse{}
+	responseArticle.ID = newArticle.ID
+	responseArticle.Title = newArticle.Title
+	responseArticle.Body = newArticle.Body
+	responseArticle.UserID = newArticle.UserID
+	responseArticle.Tags = requestArticle.TagIDs
+
+	return http.StatusCreated, responseArticle, nil
 }
 
 func (a *Article) Update(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
