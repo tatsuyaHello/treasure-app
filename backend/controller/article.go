@@ -55,13 +55,17 @@ func (a *Article) Show(w http.ResponseWriter, r *http.Request) (int, interface{}
 }
 
 func (a *Article) Create(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
-	newArticle := &model.Article{}
-	if err := json.NewDecoder(r.Body).Decode(&newArticle); err != nil {
+	requestArticle := &model.RequestCreateArticle{}
+	if err := json.NewDecoder(r.Body).Decode(&requestArticle); err != nil {
 		return http.StatusBadRequest, nil, err
 	}
 
+	newArticle := &model.Article{}
+	newArticle.Body = requestArticle.Body
+	newArticle.Title = requestArticle.Title
+
 	articleService := service.NewArticleService(a.dbx)
-	id, err := articleService.Create(newArticle)
+	id, err := articleService.Create(newArticle, requestArticle.TagIDs)
 	if err != nil {
 		return http.StatusInternalServerError, nil, err
 	}
