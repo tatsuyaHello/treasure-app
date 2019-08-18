@@ -3,28 +3,6 @@ import { BrowserRouter, Route, Link } from 'react-router-dom'
 
 import { showLecture } from "../API/api"
 
-// export const About = ({ match }) => (
-//   <div>
-//     <h2>About</h2>
-//     <p>フレンズに投票するページです</p>
-//     <p>DEMO: {match.params.id}</p>
-//   </div>
-// )
-
-// export class About extends Component {
-//   render() {
-//     const {params} = this.props.match
-//     return(
-//       <div>
-//         <h2>About</h2>
-//         <p>フレンズに投票するページです</p>
-//         <p>DEMO: {params.id}</p>
-//       </div>
-//     )
-//   }
-// }
-
-
 export class About extends Component {
   constructor(props) {
     super(props);

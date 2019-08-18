@@ -7,6 +7,7 @@ import (
 	"github.com/voyagegroup/treasure-app/model"
 )
 
+// GetUser is
 func GetUser(db *sqlx.DB, uid string) (*model.User, error) {
 	var u model.User
 	if err := db.Get(&u, `
@@ -17,6 +18,7 @@ select id, firebase_uid, display_name, email, photo_url from user where firebase
 	return &u, nil
 }
 
+// SyncUser is
 func SyncUser(db *sqlx.DB, fu *model.FirebaseUser) (sql.Result, error) {
 	return db.Exec(`
 INSERT INTO user (firebase_uid, display_name, email, photo_url)

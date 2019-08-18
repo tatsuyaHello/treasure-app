@@ -32,6 +32,7 @@ func AllLecture(db *sqlx.DB) ([]model.Lecture, error) {
 // 検索ワードが以下のいずれかに含まれているものを、検索結果として返す
 // タイトル, サブタイトル, 英語タイトル, 講師, 概要, ゴール
 
+// FindLecture is
 func FindLecture(db *sqlx.DB, title, english_title, semester, location, lecture_style, teacher, overview string, unit int64) ([]model.Lecture, error) {
 	a := make([]model.Lecture, 0)
 	if unit != 100 {
@@ -60,6 +61,7 @@ func FindLecture(db *sqlx.DB, title, english_title, semester, location, lecture_
 	return a, nil
 }
 
+// ShowLecture is
 func ShowLecture(db *sqlx.DB, lecture_id string) (*model.Lecture, error) {
 	a := model.Lecture{}
 	if err := db.Get(&a, `
@@ -81,6 +83,7 @@ func ShowLecture(db *sqlx.DB, lecture_id string) (*model.Lecture, error) {
 	return &a, nil
 }
 
+// CreateReview is
 func CreateReview(db *sqlx.Tx, a *model.Review) (sql.Result, error) {
 	stmt, err := db.Prepare(`
 INSERT INTO reviews (lecture_id, content) VALUES (?, ?)
@@ -92,6 +95,7 @@ INSERT INTO reviews (lecture_id, content) VALUES (?, ?)
 	return stmt.Exec(a.LectureID, a.Content)
 }
 
+// GetReviews is
 func GetReviews(db *sqlx.DB, id string) ([]model.Review, error) {
 	a := make([]model.Review, 0)
 	if err := db.Select(&a, `

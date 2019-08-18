@@ -79,13 +79,6 @@ func (s *Server) Route() *mux.Router {
 	r.Methods(http.MethodGet).Path("/public").Handler(commonChain.Then(sample.NewPublicHandler()))
 	r.Methods(http.MethodGet).Path("/private").Handler(authChain.Then(sample.NewPrivateHandler(s.dbx)))
 
-	articleController := controller.NewArticle(s.dbx)
-	r.Methods(http.MethodPost).Path("/articles").Handler(authChain.Then(AppHandler{articleController.Create}))
-	r.Methods(http.MethodPut).Path("/articles/{id}").Handler(authChain.Then(AppHandler{articleController.Update}))
-	r.Methods(http.MethodDelete).Path("/articles/{id}").Handler(authChain.Then(AppHandler{articleController.Destroy}))
-	r.Methods(http.MethodGet).Path("/articles").Handler(commonChain.Then(AppHandler{articleController.Index}))
-	r.Methods(http.MethodGet).Path("/articles/{id}").Handler(commonChain.Then(AppHandler{articleController.Show}))
-
 	lectureController := controller.NewLecture(s.dbx)
 	r.Methods(http.MethodGet).Path("/lectures").Handler(commonChain.Then(AppHandler{lectureController.Index}))
 	r.Methods(http.MethodGet).Path("/lecture").Handler(commonChain.Then(AppHandler{lectureController.Search}))
@@ -96,9 +89,6 @@ func (s *Server) Route() *mux.Router {
 	r.Methods(http.MethodPost).Path("/lectures/{lecture_id}/reviews").Handler(commonChain.Then(AppHandler{reviewController.CreateReview}))
 
 	r.Methods(http.MethodGet).Path("/reviews/{lecture_id}").Handler(commonChain.Then(AppHandler{reviewController.Index}))
-
-	commentController := controller.NewComment(s.dbx)
-	r.Methods(http.MethodPost).Path("/articles/{article_id}/comments").Handler(authChain.Then(AppHandler{commentController.CreateComment}))
 
 	r.PathPrefix("").Handler(commonChain.Then(http.StripPrefix("/img", http.FileServer(http.Dir("./img")))))
 	return r
