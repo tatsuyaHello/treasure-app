@@ -150,6 +150,11 @@ export class About extends Component {
       marginLeft: 50,
       fontSize: 14
     };
+    var gradeEvaluate = {
+      color: "#007700",
+      fontWeight: "bold",
+      paddingBottom: 10
+    };
     var buttom = {
       display: "-webkit-flex",
       display: "flex",
@@ -246,6 +251,9 @@ export class About extends Component {
             <div style={middleRight}>
               <div>
                 <p></p>
+              </div>
+              <div style={gradeEvaluate}>
+                成績評価方法・基準
               </div>
               <div>
                 {this.state.evaluate_list.map((l)=>(
