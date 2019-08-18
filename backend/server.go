@@ -89,6 +89,7 @@ func (s *Server) Route() *mux.Router {
 	lectureController := controller.NewLecture(s.dbx)
 	r.Methods(http.MethodGet).Path("/lectures").Handler(commonChain.Then(AppHandler{lectureController.Index}))
 	r.Methods(http.MethodGet).Path("/lecture").Handler(commonChain.Then(AppHandler{lectureController.Search}))
+	r.Methods(http.MethodGet).Path("/lecture/show/{id}").Handler(commonChain.Then(AppHandler{lectureController.Show}))
 
 	reviewController := controller.NewReview(s.dbx)
 	// 一旦、講義に対して誰でもレビューをすることができる状態にする

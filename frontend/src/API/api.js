@@ -31,3 +31,21 @@ export const searchLecture = async function(state)  {
     })
   }
 }
+
+
+export const showLecture = async function(lecture_id)  {
+  let url = "http://localhost:1991/lecture/show/"+lecture_id
+  return fetch(url, {
+    method: "GET",
+    headers: new Headers({
+      "Content-Type": "application/json",
+    }),
+  }).then(res => {
+    if (res.ok) {
+      console.log(res)
+      return res.json();
+    } else {
+      throw Error(`Request rejected with status ${res.status}`);
+    }
+  })
+}

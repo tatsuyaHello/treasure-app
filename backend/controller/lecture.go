@@ -39,6 +39,30 @@ func (a *Lecture) Index(w http.ResponseWriter, r *http.Request) (int, interface{
 	return http.StatusOK, lectures, nil
 }
 
+func (a *Lecture) Show(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
+	// URLからクエリパラメータを取得する
+	vars := mux.Vars(r)
+	lecture_id, ok := vars["id"]
+	if !ok {
+		return http.StatusBadRequest, nil, &httputil.HTTPError{Message: "invalid path parameter"}
+	}
+	var err error
+
+	// 何も指定しない場合は、BadRequestを返す
+	if lecture_id == "" {
+		return http.StatusBadRequest, nil, err
+	}
+
+	lecture, err := repository.ShowLecture(a.dbx, lecture_id)
+	if err != nil && err == sql.ErrNoRows {
+		return http.StatusNotFound, nil, err
+	} else if err != nil {
+		return http.StatusInternalServerError, nil, err
+	}
+
+	return http.StatusOK, lecture, nil
+}
+
 func (a *Lecture) Search(w http.ResponseWriter, r *http.Request) (int, interface{}, error) {
 	// URLからクエリパラメータを取得する
 	title := r.URL.Query().Get("title")

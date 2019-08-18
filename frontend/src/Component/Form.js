@@ -107,6 +107,9 @@ export class Form extends React.Component {
   }
 
   render() {
+    var all = {
+      marginTop: 30
+    };
     var search = {
       textAlign: "left",
       fontSize: 20,
@@ -177,7 +180,7 @@ export class Form extends React.Component {
       fontSize: 8
     };
     return (
-      <div>
+      <div style={all}>
         <div style={search}>
           <div style={searchHeader}>
             検索項目
@@ -215,7 +218,7 @@ export class Form extends React.Component {
             {this.state.list.map((l)=>(
                     <div key={l.result_title} style={searchResultUnit}>
                       <div>
-                        <Link style={{ textDecoration: 'none' }} to='/about'>{l.result_lecture_id}</Link> / {l.result_unit}
+                        <Link style={{ textDecoration: 'none' }} to={'/about/'+l.result_lecture_id}>{l.result_lecture_id}</Link> / {l.result_unit}
                       </div>
                       <div>
                         {l.result_title} {l.result_location}

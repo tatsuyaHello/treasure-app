@@ -60,6 +60,27 @@ func FindLecture(db *sqlx.DB, title, english_title, semester, location, lecture_
 	return a, nil
 }
 
+func ShowLecture(db *sqlx.DB, lecture_id string) (*model.Lecture, error) {
+	a := model.Lecture{}
+	if err := db.Get(&a, `
+		SELECT * FROM lectures WHERE lecture_id = ?
+	`, lecture_id); err != nil {
+		return nil, err
+	}
+	b := make([]model.Evaluate, 0)
+	if err := db.Select(&b, `SELECT method, comment, percentage FROM evaluates WHERE id=?`, a.EvaluateID); err != nil {
+		return nil, err
+	}
+	a.Evaluate = b
+
+	c := make([]model.Scehdule, 0)
+	if err := db.Select(&c, `SELECT session FROM scehdules WHERE lecture_id=?`, a.LectureID); err != nil {
+		return nil, err
+	}
+	a.Scehdule = c
+	return &a, nil
+}
+
 func CreateReview(db *sqlx.Tx, a *model.Review) (sql.Result, error) {
 	stmt, err := db.Prepare(`
 INSERT INTO reviews (lecture_id, content) VALUES (?, ?)
