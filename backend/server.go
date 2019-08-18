@@ -63,7 +63,7 @@ func (s *Server) Route() *mux.Router {
 	authMiddleware := middleware.NewAuthMiddleware(s.authClient, s.dbx)
 	corsMiddleware := cors.New(cors.Options{
 		AllowedOrigins: []string{"*"},
-		AllowedHeaders: []string{"Authorization"},
+		AllowedHeaders: []string{"Content-Type"},
 	})
 
 	commonChain := alice.New(
@@ -85,6 +85,16 @@ func (s *Server) Route() *mux.Router {
 	r.Methods(http.MethodDelete).Path("/articles/{id}").Handler(authChain.Then(AppHandler{articleController.Destroy}))
 	r.Methods(http.MethodGet).Path("/articles").Handler(commonChain.Then(AppHandler{articleController.Index}))
 	r.Methods(http.MethodGet).Path("/articles/{id}").Handler(commonChain.Then(AppHandler{articleController.Show}))
+
+	lectureController := controller.NewLecture(s.dbx)
+	r.Methods(http.MethodGet).Path("/lectures").Handler(commonChain.Then(AppHandler{lectureController.Index}))
+	r.Methods(http.MethodGet).Path("/lecture").Handler(commonChain.Then(AppHandler{lectureController.Search}))
+
+	reviewController := controller.NewReview(s.dbx)
+	// 一旦、講義に対して誰でもレビューをすることができる状態にする
+	r.Methods(http.MethodPost).Path("/lectures/{lecture_id}/reviews").Handler(commonChain.Then(AppHandler{reviewController.CreateReview}))
+
+	r.Methods(http.MethodGet).Path("/reviews/{lecture_id}").Handler(commonChain.Then(AppHandler{reviewController.Index}))
 
 	commentController := controller.NewComment(s.dbx)
 	r.Methods(http.MethodPost).Path("/articles/{article_id}/comments").Handler(authChain.Then(AppHandler{commentController.CreateComment}))

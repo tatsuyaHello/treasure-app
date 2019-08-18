@@ -15,6 +15,9 @@ create-token:
 req-articles:
 	curl -v $(HOST):$(PORT)/articles
 
+req-articles:
+	curl -v $(HOST):$(PORT)/lectures
+
 req-img-pei:
 	curl -v $(HOST):$(PORT)/img/pei.png
 

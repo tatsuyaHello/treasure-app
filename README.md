@@ -19,3 +19,7 @@ v10.15.3
 
 ### Links
  - https://12factor.net
+
+
+# オリジナル TreasureApp
+- 全てのデータをDBに格納したい場合は、 `//NOTE`の箇所を変更してやる。

@@ -1,60 +1,28 @@
-import { h, Component } from "preact";
-import firebase from "./firebase";
-import { getPrivateMessage, getPublicMessage } from "./api";
+import React, { Component } from "react";
+import { BrowserRouter, Route, Link } from 'react-router-dom'
 
-class App extends Component {
-  constructor() {
-    super();
-    this.state.user = null;
-    this.state.message = "";
-    this.state.errorMessage = "";
-  }
+import { Form } from './Component/Form';
 
-  componentDidMount() {
-    firebase.auth().onAuthStateChanged(user => {
-      if (user) {
-        this.setState({ user });
-      } else {
-        this.setState({
-          user: null
-        });
-      }
-    });
-  }
+const App = () => (
+  <BrowserRouter>
+    <div>
+      <ul>
+       <li><Link to='/'>Home</Link></li>
+       <li><Link to='/about'>About</Link></li>
+     </ul>
 
-  getPrivateMessage() {
-    this.state.user
-      .getIdToken()
-      .then(token => {
-        return getPrivateMessage(token);
-      })
-      .then(resp => {
-        this.setState({
-          message: resp.message
-        });
-      })
-      .catch(error => {
-        this.setState({
-          errorMessage: error.toString()
-        });
-      });
-  }
+      <Route exact path='/' component={Form} />
+      <Route path='/about' component={About} />
+    </div>
+  </BrowserRouter>
+)
 
-  render(props, state) {
-    if (state.user === null) {
-      return <button onClick={firebase.login}>Please login</button>;
-    }
-    return (
-      <div>
-        <div>{state.message}</div>
-        <p style="color:red;">{state.errorMessage}</p>
-        <button onClick={this.getPrivateMessage.bind(this)}>
-          Get Private Message
-        </button>
-        <button onClick={firebase.logout}>Logout</button>
-      </div>
-    );
-  }
-}
+const About = () => (
+  <div>
+    <h2>About</h2>
+    <p>フレンズに投票するページです</p>
+  </div>
+)
+
 
 export default App;
