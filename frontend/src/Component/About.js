@@ -1,7 +1,19 @@
 import React, { Component } from "react";
+import Modal from 'react-modal';
 import { BrowserRouter, Route, Link } from 'react-router-dom'
 
 import { showLecture } from "../API/api"
+
+const customStyles = {
+  content : {
+    top                   : '50%',
+    left                  : '50%',
+    right                 : 'auto',
+    bottom                : 'auto',
+    marginRight           : '-50%',
+    transform             : 'translate(-50%, -50%)'
+  }
+};
 
 export class About extends Component {
   constructor(props) {
@@ -21,8 +33,25 @@ export class About extends Component {
       result_textbook: '',
       result_remarks: '',
       scehdule_list: [],
-      evaluate_list: []
+      evaluate_list: [],
+      modalIsOpen: false
     };
+    this.openModal = this.openModal.bind(this);
+    this.afterOpenModal = this.afterOpenModal.bind(this);
+    this.closeModal = this.closeModal.bind(this);
+  }
+
+  openModal() {
+    this.setState({modalIsOpen: true});
+  }
+
+  afterOpenModal() {
+    // references are now sync'd and can be accessed.
+    this.subtitle.style.color = '#337AB7';
+  }
+
+  closeModal() {
+    this.setState({modalIsOpen: false});
   }
 
   componentDidMount() {
@@ -88,7 +117,7 @@ export class About extends Component {
       marginTop: 10,
       float: "left"
     };
-    var reviewButton = {
+    var Button = {
       width: 140,
       marginTop: 16,
       marginRight: 4,
@@ -191,7 +220,16 @@ export class About extends Component {
     };
     var scehduleDetail = {
       
-    }
+    };
+    var modalTextarea = {
+      resize: "none",
+      width: 400,
+      height: 100,
+      border: "ridge",
+      borderWidth: "thin",
+      borderColor: "#008080",
+      borderRadius: 5,
+    };
     return (
       <div style={all}>
         <div style={head}>
@@ -199,9 +237,24 @@ export class About extends Component {
             <div style={mainTitle}>
              {this.state.result_title}
             </div>
-            <div style={reviewButton}>
+            <button style={Button} onClick={this.openModal}>
              レビューを書く
-            </div>
+            </button>
+            <Modal
+            isOpen={this.state.modalIsOpen}
+            onAfterOpen={this.afterOpenModal}
+            onRequestClose={this.closeModal}
+            style={customStyles}
+            contentLabel="Example Modal"
+            >
+              <h2 ref={subtitle => this.subtitle = subtitle}>この講義に対するレビューをどうぞ</h2>
+              <form>
+                <textarea style={modalTextarea} />
+                <br />
+                <button style={Button}>Let's go</button>
+              </form>
+              <button style={Button} onClick={this.closeModal}>やっぱやめ</button>
+            </Modal>
           </div>
           <div style={headTable}>
             <tbody>
